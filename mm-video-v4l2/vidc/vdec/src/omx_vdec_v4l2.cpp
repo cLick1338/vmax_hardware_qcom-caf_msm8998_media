@@ -3731,8 +3731,15 @@ OMX_ERRORTYPE omx_vdec::get_supported_profile_level(OMX_VIDEO_PARAM_PROFILELEVEL
                                 (unsigned int)profileLevelType->nProfileIndex);
                 eRet = OMX_ErrorNoMore;
             }
-        } else if (!strncmp(drv_ctx.kind, "OMX.qcom.video.decoder.vp8",OMX_MAX_STRINGNAME_SIZE) ||
-                !strncmp(drv_ctx.kind, "OMX.qcom.video.decoder.vp9",OMX_MAX_STRINGNAME_SIZE)) {
+        } else if (!strncmp(drv_ctx.kind, "OMX.qcom.video.decoder.vp9",OMX_MAX_STRINGNAME_SIZE)) {
+            //Vmax: HW has no 10-bit VP9; advertise Profile 0 only so HDR (Profile 2) goes to the SW decoder
+            if (profileLevelType->nProfileIndex == 0) {
+                profileLevelType->eProfile = 0x1; //OMX_VIDEO_VP9Profile0
+                profileLevelType->eLevel   = 0x100; //OMX_VIDEO_VP9Level5
+            } else {
+                eRet = OMX_ErrorNoMore;
+            }
+        } else if (!strncmp(drv_ctx.kind, "OMX.qcom.video.decoder.vp8",OMX_MAX_STRINGNAME_SIZE)) {
             eRet = OMX_ErrorNoMore;
         } else if (!strncmp(drv_ctx.kind, "OMX.qcom.video.decoder.mpeg2",OMX_MAX_STRINGNAME_SIZE)) {
             if (profileLevelType->nProfileIndex == 0) {
